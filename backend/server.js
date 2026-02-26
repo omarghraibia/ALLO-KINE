@@ -7,18 +7,13 @@ require('dotenv').config();
 
 const app = express();
 
-// --- 🛡️ MIDDLEWARES DE SÉCURITÉ (Priorité Haute) ---
-
-// 1. Configuration globale de Helmet
+// --- 🛡️ MIDDLEWARES DE SÉCURITÉ ---
 app.use(helmet()); 
-
-// 2. Masquer la stack technique pour éviter le scan de vulnérabilités
 app.disable('x-powered-by');
-
-// 3. Protection contre le Clickjacking
 app.use(helmet.frameguard({ action: 'deny' }));
+app.use(helmet.noSniff());
 
-// 4. Configuration de la Content Security Policy (CSP) - Corrige l'erreur "Critique"
+// Configuration de la CSP (Sécurité contre XSS)
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -31,49 +26,30 @@ app.use(
   })
 );
 
-// 5. Autres en-têtes de sécurité
-app.use(helmet.noSniff()); // Protection MIME sniffing
-app.use(helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }));
-
-// 6. Restriction des fonctionnalités navigateur
-app.use((req, res, next) => {
-  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
-  next();
-});
-
-// --- ⚙️ CONFIGURATION RÉSEAU & PARSING ---
-
 app.use(cors());
-app.use(express.json({ limit: '10kb' })); // Protection contre les attaques DOS
+app.use(express.json({ limit: '10kb' })); 
 
-// Protection contre le brute-force et le spam
+// Protection contre le spam de requêtes
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
+  windowMs: 15 * 60 * 1000, 
   max: 100 
 });
 app.use('/api/', limiter);
 
 // --- 🔗 CONNEXION BASE DE DONNÉES ---
-
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Base de données connectée avec succès ! 🛡️'))
+  .then(() => console.log('Base de données connectée ! 🛡️'))
   .catch(err => console.error('Erreur de connexion MongoDB :', err));
 
 // --- 📍 ROUTES ---
-
 app.get('/', (req, res) => {
   res.send('Serveur ALLO KINÉ Sécurisé 🛡️');
 });
 
-// Route pour la gestion des rendez-vous
+// Importation des routes (Assure-toi que ces fichiers existent)
 app.use('/api/appointments', require('./routes/appointments'));
-
-// --- 🚀 LANCEMENT DU SERVEUR ---
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Serveur lancé sur le port ${PORT}`);
-});
-
-// Ajoutez ceci avec vos autres routes
 app.use('/api/auth', require('./routes/auth'));
+
+// --- ⚙️ LANCEMENT UNIQUE ---
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Serveur lancé sur le port ${PORT}`));

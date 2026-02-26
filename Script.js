@@ -92,3 +92,38 @@ if ('serviceWorker' in navigator) {
             .catch(err => console.error('Erreur Service Worker :', err));
     });
 }
+// Assure-toi de remplacer 'votre-id-formulaire' par l'ID réel de ton formulaire HTML (ex: 'contact-form')
+document.getElementById('votre-id-formulaire').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Empêche le rechargement classique de la page
+    
+    // 1. On récupère les valeurs tapées par le patient
+    const formData = {
+        nom: document.getElementById('nom').value,
+        prenom: document.getElementById('prenom').value,
+        telephone: document.getElementById('telephone').value,
+        motif: document.getElementById('motif').value,
+        diagnostic: document.getElementById('diagnostic').value
+    };
+
+    try {
+        // 2. On envoie les données à notre API sécurisée
+        const response = await fetch('http://localhost:5000/api/appointments', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(formData)
+        });
+
+        // 3. On vérifie la réponse du serveur
+        if (response.ok) {
+            alert("Rendez-vous enregistré avec succès dans la base de données !");
+            e.target.reset(); // Vide les champs du formulaire
+        } else {
+            alert("Erreur lors de l'enregistrement du rendez-vous.");
+        }
+    } catch (error) {
+        console.error("Erreur de connexion :", error);
+        alert("Impossible de contacter le serveur. Vérifiez qu'il est bien lancé.");
+    }
+});
