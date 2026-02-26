@@ -1,2 +1,3 @@
 npm init -y
-npm install express mongoose dotenv cors helmet bcryptjs jsonwebtoken express-rate-limit
+npm install express mongoose dotenv cors helmet bcryptjs jsonwebtoken express-rate-limitnode_modules/
+.env
