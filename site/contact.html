@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & Réservation | ALLO KINÉ</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0A192F">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <meta name="description" content="Contactez le cabinet de kinésithérapie ALLO KINÉ à La Marsa (Tunis).">
+    <meta property="og:title" content="ALLO KINÉ | Contact & Réservation">
+    <meta property="og:url" content="https://allokine.netlify.app/contact.html">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <a href="index.html" class="logo-link">
+        <img src="logo.png" alt="Logo Allo Kiné"
+             style="width:55px;height:55px;border-radius:50%;border:2px solid var(--gold-accent);object-fit:cover;">
+        <div style="display:flex;flex-direction:column;justify-content:center;">
+            <div class="brand-name">ALLO KINÉ</div>
+            <div style="color:var(--gold-accent);font-size:0.85rem;font-weight:bold;">
+                Dr Fethi Ghraybia
+            </div>
+        </div>
+    </a>
+
+    <div class="menu-toggle" id="mobile-menu">☰</div>
+    <nav>
+        <ul id="nav-menu">
+            <li><a href="index.html">Accueil</a></li>
+            <li><a href="competences.html">Nos Soins & Tarifs</a></li>
+            <li><a href="experiences.html">Expertise</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><button id="theme-toggle" class="theme-btn">🌙</button></li>
+        </ul>
+    </nav>
+</header>
+
+<main style="margin-top:120px;padding:0 5%;min-height:80vh;">
+    <section style="max-width:900px;margin:0 auto;">
+
+        <h1 class="section-title"
+            style="text-align:center;margin-bottom:2rem;color:var(--gold-accent);">
+            Dossier de Pré-Consultation & Demande
+        </h1>
+
+        <!-- WhatsApp -->
+        <div style="text-align:center;margin-bottom:3rem;">
+            <p>Pour une urgence :</p>
+            <a href="https://wa.me/21698561586"
+               target="_blank"
+               style="display:inline-block;padding:1rem 2rem;background:#25D366;color:white;
+               text-decoration:none;border-radius:30px;font-weight:bold;">
+                💬 WhatsApp : +216 98 56 15 86
+            </a>
+        </div>
+
+        <!-- Formulaire -->
+        <div style="background:var(--card-bg);padding:2rem;border-radius:15px;">
+            <form id="appointment-form">
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;">
+                    <input type="text" id="nom" class="vip-input" placeholder="Nom *" required>
+                    <input type="text" id="prenom" class="vip-input" placeholder="Prénom *" required>
+                </div>
+
+                <div style="margin-top:2rem;text-align:center;">
+                    <button type="submit" id="submit-btn"
+                            style="padding:1rem 2rem;border:none;border-radius:30px;
+                            background:var(--gold-accent);cursor:pointer;font-weight:bold;">
+                        Envoyer ma demande
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Carte -->
+        <div style="margin-top:4rem;">
+            <h2 style="text-align:center;margin-bottom:2rem;">Notre Localisation</h2>
+            <div style="border-radius:15px;overflow:hidden;">
+                <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3192.170617374778!2d10.3235!3d36.88!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzbCsDUyJzQ4LjAiTiAxMMKwMTknMjQuNiJF!5e0!3m2!1sfr!2stn"
+                    width="100%" height="450" style="border:0;" loading="lazy">
+                </iframe>
+            </div>
+        </div>
+
+    </section>
+</main>
+
+<footer style="background-color:var(--nav-bg);color:white;text-align:center;padding:3rem;">
+    <h3 style="color:var(--gold-accent);">ALLO KINÉ</h3>
+    <p>📍 Rue Errazi, La Marsa — Tunis, Tunisie</p>
+    <p style="font-size:0.8rem;opacity:0.6;">© 2026 Tous droits réservés.</p>
+</footer>
+
+<!-- Script Formulaire -->
+<script>
+document.getElementById('appointment-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerText = "Envoi en cours...";
+
+    const formData = {
+        nom: document.getElementById('nom').value,
+        prenom: document.getElementById('prenom').value
+    };
+
+    try {
+        const response = await fetch('http://localhost:5000/api/appointments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            alert("Rendez-vous enregistré !");
+            e.target.reset();
+        } else {
+            alert("Erreur serveur.");
+        }
+
+    } catch (error) {
+        alert("Erreur lors de l'envoi.");
+    }
+
+    btn.disabled = false;
+    btn.innerText = "Envoyer ma demande";
+});
+</script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
