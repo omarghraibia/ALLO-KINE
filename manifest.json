@@ -1,0 +1,21 @@
+{
+  "name": "ALLO KINÉ - Cabinet de Kinésithérapie",
+  "short_name": "Allo Kiné",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0A192F",
+  "theme_color": "#C5A059",
+  "description": "Prenez rendez-vous et suivez vos programmes de rééducation sportive.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

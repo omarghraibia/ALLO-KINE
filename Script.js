@@ -84,3 +84,11 @@ if (reviewForm) {
         alert("Merci pour votre avis !");
     });
 }
+// Activer le Service Worker pour la PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Service Worker enregistré !'))
+            .catch(err => console.error('Erreur Service Worker :', err));
+    });
+}
