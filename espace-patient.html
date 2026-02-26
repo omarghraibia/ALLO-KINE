@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Espace Patient | ALLO KINÉ</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background-color: var(--bg-color); color: var(--text-color); }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 5%; background: var(--nav-bg); border-bottom: 2px solid var(--gold-accent); }
+        .dashboard-container { padding: 3rem 5%; min-height: 80vh; max-width: 1000px; margin: 0 auto; }
+        .welcome-card { background: var(--card-bg); padding: 2rem; border-radius: 10px; box-shadow: var(--shadow-premium); border-left: 5px solid var(--gold-accent); margin-bottom: 2rem; }
+        .action-btn { background: var(--gold-accent); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; margin-top: 15px; transition: 0.3s; }
+        .action-btn:hover { background: #b5952f; }
+        .logout-btn { background: #ff4757; color: white; padding: 0.6rem 1.2rem; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .logout-btn:hover { background: #ff6b81; }
+        .history-box { background: var(--card-bg); padding: 2rem; border-radius: 10px; text-align: center; border: 1px dashed var(--gold-accent); opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <header class="dashboard-header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="logo.png" alt="Logo Allo Kiné" style="width: 50px; border-radius: 50%;">
+            <h2 style="margin: 0; font-family: 'Georgia', serif; color: var(--gold-accent);">Mon Espace</h2>
+        </div>
+        <button id="logout-btn" class="logout-btn">Déconnexion</button>
+    </header>
+
+    <main class="dashboard-container">
+        <div class="welcome-card">
+            <h2>Bienvenue dans votre espace personnel de santé</h2>
+            <p style="margin-top: 10px; opacity: 0.9;">Gérez vos consultations, suivez votre rééducation et contactez le cabinet du Dr Ghraybia en toute simplicité.</p>
+            <a href="contact.html" class="action-btn">Prendre un nouveau rendez-vous</a>
+        </div>
+
+        <h3 style="margin-bottom: 1rem; color: var(--gold-accent);">Historique de mes soins</h3>
+        
+        <div class="history-box">
+            <p>📋 Vos futurs rendez-vous et bilans s'afficheront ici.</p>
+            <p style="font-size: 0.85rem; margin-top: 10px; opacity: 0.7;">(Fonctionnalité en cours de synchronisation avec le cabinet)</p>
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+
+        if (!token || role !== 'patient') {
+            window.location.href = 'login.html';
+        }
+
+        // --- DÉCONNEXION ---
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = 'index.html';
+        });
+
+        // --- CHARGER L'HISTORIQUE DES RDV ---
+        const loadMyHistory = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/appointments/me', {
+                    method: 'GET',
+                    headers: { 'x-auth-token': token }
+                });
+
+                if (response.ok) {
+                    const appointments = await response.json();
+                    const historyBox = document.querySelector('.history-box');
+                    
+                    if (appointments.length === 0) {
+                        historyBox.innerHTML = '<p>📋 Vous n\'avez pas encore de rendez-vous ou de bilans enregistrés.</p>';
+                    } else {
+                        let htmlContent = '<h4 style="color:var(--gold-accent); margin-bottom:15px; text-align:left;">Vos dernières demandes :</h4><ul style="list-style:none; padding:0; text-align:left;">';
+                        
+                        appointments.forEach(app => {
+                            const dateStr = new Date(app.createdAt).toLocaleDateString('fr-FR');
+                            let statusColor = app.statut === 'en_attente' ? 'orange' : 'green';
+                            
+                            htmlContent += `
+                                <li style="background: rgba(255,255,255,0.05); margin-bottom: 10px; padding: 15px; border-radius: 8px; border-left: 3px solid ${statusColor};">
+                                    <strong>${dateStr}</strong> - ${app.motif} <br>
+                                    <span style="font-size:0.85rem; opacity:0.8;">Diagnostic : ${app.diagnostic}</span><br>
+                                    <span style="font-size:0.85rem; color:${statusColor}; font-weight:bold;">Statut: ${app.statut.replace('_', ' ')}</span>
+                                </li>
+                            `;
+                        });
+                        htmlContent += '</ul>';
+                        historyBox.innerHTML = htmlContent;
+                    }
+                }
+            } catch (error) {
+                console.error("Erreur de chargement de l'historique", error);
+            }
+        };
+
+        // Lancer le chargement au démarrage de la page
+        loadMyHistory();
+    </script>
+</body>
+</html>

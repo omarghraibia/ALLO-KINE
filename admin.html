@@ -2,52 +2,144 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Admin | ALLO KINÉ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord | ALLO KINÉ</title>
+    
     <link rel="stylesheet" href="style.css">
+    
     <style>
-        .dashboard-container { margin-top: 120px; padding: 2rem; }
-        table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 10px; overflow: hidden; }
-        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { background: var(--nav-bg); color: white; }
-        .status-badge { padding: 5px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
-        .en_attente { background: #f1c40f; color: #000; }
+        /* Styles spécifiques pour l'interface d'administration */
+        body { background-color: var(--bg-color); color: var(--text-color); }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 5%; background: var(--nav-bg); border-bottom: 2px solid var(--gold-accent); }
+        .admin-container { padding: 3rem 5%; min-height: 80vh; }
+        .dashboard-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        
+        /* Design du tableau de données */
+        .table-wrapper { overflow-x: auto; background: var(--card-bg); border-radius: 10px; box-shadow: var(--shadow-premium); }
+        .appointments-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .appointments-table th, .appointments-table td { padding: 1.2rem; border-bottom: 1px solid rgba(255, 215, 0, 0.1); }
+        .appointments-table th { background-color: rgba(10, 25, 47, 0.8); color: var(--gold-accent); font-weight: bold; text-transform: uppercase; font-size: 0.9rem; }
+        .appointments-table tr:hover { background-color: rgba(255, 215, 0, 0.05); }
+        
+        /* Boutons d'action */
+        .logout-btn { background: #ff4757; color: white; padding: 0.8rem 1.5rem; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .logout-btn:hover { background: #ff6b81; }
+        .refresh-btn { background: var(--gold-accent); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .status-badge { padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; background: rgba(255, 215, 0, 0.15); color: var(--gold-accent); border: 1px solid var(--gold-accent); }
     </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <h1>Rendez-vous Patients</h1>
-        <div id="appointments-list">
-            <p>Chargement des données sécurisées...</p>
+
+    <header class="admin-header">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="logo.png" alt="Logo" style="width: 50px; border-radius: 50%; border: 2px solid var(--gold-accent);">
+            <h2 style="margin: 0; font-family: 'Georgia', serif;">Espace Dr Fethi Ghraybia</h2>
         </div>
-    </div>
+        <button id="logout-btn" class="logout-btn">Déconnexion</button>
+    </header>
+
+    <main class="admin-container">
+        <div class="dashboard-controls">
+            <h1 style="color: var(--gold-accent);">Gestion des Rendez-vous</h1>
+            <button id="refresh-btn" class="refresh-btn">🔄 Actualiser la liste</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="appointments-table">
+                <thead>
+                    <tr>
+                        <th>Date de demande</th>
+                        <th>Patient</th>
+                        <th>Téléphone</th>
+                        <th>Motif</th>
+                        <th>Diagnostic</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="appointments-body">
+                    <tr><td colspan="6" style="text-align: center; padding: 2rem;">Chargement des données sécurisées...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
 
     <script>
-        async function loadAppointments() {
-            const token = localStorage.getItem('token');
-            if (!token) window.location.href = 'login.html'; // Redirige si non connecté
-
-            try {
-                const response = await fetch('http://localhost:5000/api/appointments', {
-                    headers: { 'x-auth-token': token }
-                });
-                const data = await response.json();
-                
-                let html = '<table><tr><th>Patient</th><th>Motif</th><th>Statut</th><th>Date</th></tr>';
-                data.forEach(app => {
-                    html += `<tr>
-                        <td>${app.nom} ${app.prenom}</td>
-                        <td>${app.motif}</td>
-                        <td><span class="status-badge ${app.statut}">${app.statut}</span></td>
-                        <td>${new Date(app.createdAt).toLocaleDateString()}</td>
-                    </tr>`;
-                });
-                html += '</table>';
-                document.getElementById('appointments-list').innerHTML = html;
-            } catch (error) {
-                console.error("Erreur d'accès aux données.");
-            }
+        // --- 🛡️ 1. CONTRÔLE D'ACCÈS (CYBERSÉCURITÉ) ---
+        // On vérifie si le docteur possède le badge VIP (le token JWT)
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Pas de token = Expulsé vers la page de login
+            window.location.href = 'login.html';
         }
-        loadAppointments();
+
+        // --- 📡 2. RÉCUPÉRATION DES DONNÉES ---
+        const fetchAppointments = async () => {
+            try {
+                // Appel à l'API en présentant le token comme pièce d'identité
+                const response = await fetch('http://localhost:5000/api/appointments', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': token 
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    alert("Votre session a expiré. Veuillez vous reconnecter.");
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const appointments = await response.json();
+                displayAppointments(appointments);
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('appointments-body').innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ff4757;">Impossible de se connecter au serveur backend.</td></tr>';
+            }
+        };
+
+        // --- 📊 3. AFFICHAGE DANS LE TABLEAU ---
+        const displayAppointments = (appointments) => {
+            const tbody = document.getElementById('appointments-body');
+            tbody.innerHTML = ''; 
+
+            if (appointments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem;">Aucun rendez-vous en attente.</td></tr>';
+                return;
+            }
+
+            appointments.forEach(app => {
+                // Formater la date proprement au format français
+                const dateDemande = new Date(app.createdAt).toLocaleString('fr-FR', { 
+                    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit' 
+                });
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${dateDemande}</td>
+                    <td><strong>${app.nom} ${app.prenom}</strong></td>
+                    <td><a href="tel:${app.telephone}" style="color: var(--gold-accent); text-decoration: none;">${app.telephone}</a></td>
+                    <td>${app.motif}</td>
+                    <td style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${app.diagnostic}">${app.diagnostic}</td>
+                    <td><span class="status-badge">À traiter</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        // --- 🔒 4. DÉCONNEXION ---
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            // On détruit le token JWT pour fermer la session
+            localStorage.removeItem('token');
+            window.location.href = 'login.html';
+        });
+
+        // --- 🔄 5. ACTUALISATION ---
+        document.getElementById('refresh-btn').addEventListener('click', fetchAppointments);
+
+        // Au lancement de la page, on charge les rendez-vous
+        fetchAppointments();
     </script>
 </body>
 </html>

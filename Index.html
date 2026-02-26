@@ -32,15 +32,49 @@
         </a>
         
         <div class="menu-toggle" id="mobile-menu">☰</div>
-        <nav>
+       <nav>
             <ul id="nav-menu">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="competences.html">Nos Soins & Tarifs</a></li>
-                <li><a href="experiences.html">Expertise</a></li>
                 <li><a href="contact.html">Contact</a></li>
+                
+                <li id="nav-login"><a href="login.html" style="color: var(--gold-accent);">Se connecter</a></li>
+                <li id="nav-register"><a href="register.html" style="background: var(--gold-accent); color: white; padding: 5px 15px; border-radius: 20px;">S'inscrire</a></li>
+                
+                <li id="nav-dashboard" style="display: none;"><a href="#" id="dashboard-link" style="color: var(--gold-accent); font-weight: bold;">Mon Espace</a></li>
+                <li id="nav-logout" style="display: none;"><a href="#" id="logout-btn-nav" style="color: #ff4757;">Déconnexion</a></li>
+                
                 <li><button id="theme-toggle" class="theme-btn">🌙</button></li>
             </ul>
         </nav>
+
+<script>
+    // SCRIPT DE LA NAVBAR INTELLIGENTE
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('token');
+        const role = localStorage.getItem('role');
+
+        if (token) {
+            // Si connecté, on cache Login/Register et on montre Dashboard/Logout
+            document.getElementById('nav-login').style.display = 'none';
+            document.getElementById('nav-register').style.display = 'none';
+            document.getElementById('nav-dashboard').style.display = 'inline-block';
+            document.getElementById('nav-logout').style.display = 'inline-block';
+            
+            // On dirige vers la bonne page selon le rôle
+            const dashboardLink = document.getElementById('dashboard-link');
+            dashboardLink.href = role === 'admin' ? 'admin.html' : 'espace-patient.html';
+            
+            // Gestion de la déconnexion
+            document.getElementById('logout-btn-nav').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                window.location.href = 'index.html';
+            });
+        }
+    });
+</script>
     </header>
     <main>
         <section class="hero reveal">

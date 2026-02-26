@@ -2,87 +2,56 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion Admin | ALLO KINÉ</title>
-    
-    <link rel="manifest" href="manifest.json"> <meta name="theme-color" content="#0A192F"> <link rel="apple-touch-icon" href="icon-192.png"> <link rel="stylesheet" href="style.css"> <style>
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background-color: var(--bg-color); /* cite: 14 */
-        }
-        .login-card {
-            background: var(--card-bg); /* cite: 14 */
-            padding: 3rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow-premium); /* cite: 14 */
-            width: 100%;
-            max-width: 400px;
-            border-top: 5px solid var(--gold-accent); /* cite: 14 */
-            text-align: center;
-        }
-        .login-logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 2px solid var(--gold-accent); /* cite: 14 */
-            margin-bottom: 1.5rem;
-            object-fit: cover;
-        }
+    <title>Espace Docteur | ALLO KINÉ</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f4f4f4; }
+        .login-box { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 400px; }
+        .vip-input { display: block; width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .login-btn { background: #d4af37; color: white; border: none; padding: 12px 20px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+        .login-btn:hover { background: #b5952f; }
     </style>
 </head>
 <body>
 
-    <div class="login-container">
-        <div class="login-card reveal active"> <img src="logo.png" alt="Logo Allo Kiné" class="login-logo"> <h2 style="margin-bottom: 2rem; font-family: 'Georgia', serif;">Espace Docteur</h2>
+    <div class="login-box">
+        <img src="logo.png" alt="Logo" style="width: 80px; border-radius: 50%;">
+        <h2>Espace Docteur</h2>
+        
+        <form id="login-form">
+            <input type="email" id="email" class="vip-input" placeholder="omar_oumay@hotmail.com" required>
+            <input type="password" id="password" class="vip-input" placeholder="Mot de passe" required>
             
-            <form id="login-form">
-                <input type="email" id="email" class="vip-input" placeholder="Email professionnel" required> <input type="password" id="password" class="vip-input" placeholder="Mot de passe" required> <button type="submit" id="login-btn" style="width: 100%; background: var(--gold-accent); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">
-                    Se Connecter
-                </button>
-            </form>
-            
-            <p style="margin-top: 2rem; font-size: 0.8rem; opacity: 0.6;">
-                Accès réservé au Dr Fethi Ghraybia
-            </p>
-        </div>
-    </div>
+            <button type="submit" class="login-btn">
+                Se connecter
+            </button>
+        </form>
 
-    <script>
+        <p id="error-msg" style="color: red; display: none; margin-top: 10px; text-align: center;">Identifiants incorrects</p>
+    </div> <script>
         document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Empêche la page de recharger dans le vide
+            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const btn = document.getElementById('login-btn');
-
-            btn.innerText = "Vérification...";
-            btn.disabled = true;
 
             try {
-                // Envoi des identifiants au serveur Node.js sécurisé
                 const response = await fetch('http://localhost:5000/api/auth/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
-                const data = await response.json();
-
                 if (response.ok) {
-                    // Stockage du Token JWT pour sécuriser la session admin
-                    localStorage.setItem('token', data.token);
-                    window.location.href = 'admin.html';
+                    const data = await response.json();
+                    localStorage.setItem('token', data.token); // Sauvegarde la clé
+                    window.location.href = 'admin.html'; // Redirection magique
                 } else {
-                    alert(data.msg || "Identifiants incorrects");
+                    document.getElementById('error-msg').style.display = 'block';
                 }
             } catch (error) {
-                alert("Erreur de connexion au serveur de sécurité.");
-            } finally {
-                btn.innerText = "Se Connecter";
-                btn.disabled = false;
+                console.error("Erreur:", error);
+                alert("Erreur de connexion au serveur backend. Vérifiez que le serveur est allumé et que le port 5000 est public.");
             }
         });
     </script>
