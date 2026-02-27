@@ -64,9 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                const token = localStorage.getItem('token');
-              
-                const response = await fetch('/api/appointments'), {
+                // CORRECTION ICI : Retrait de la parenthèse avant la virgule
+                const response = await fetch('/api/appointments', {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -74,6 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                     body: JSON.stringify(formData)
                 });
+                
                 if (response.ok) {
                     alert("Rendez-vous enregistré avec succès !");
                     contactForm.reset();
