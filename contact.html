@@ -28,24 +28,12 @@
         </a>
         
         <div class="menu-toggle" id="mobile-menu">☰</div>
-        <header>
-        <a href="index.html" class="logo-link">
-            
-            <img src="logo.png" alt="Logo Allo Kiné" style="width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold-accent); object-fit: cover;">
-            
-            <div style="display: flex; flex-direction: column; justify-content: center;">
-                <div class="brand-name" style="line-height: 1;">ALLO KINÉ</div>
-                <div style="color: var(--gold-accent); font-size: 0.85rem; font-weight: bold; letter-spacing: 1.5px; margin-top: 4px; text-transform: uppercase;">
-                    Dr Fethi Ghraybia
-                </div>
-            </div>
-        </a>
-        
-        <div class="menu-toggle" id="mobile-menu">☰</div>
+         <div class="menu-toggle" id="mobile-menu">☰</div>
        <nav>
             <ul id="nav-menu">
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="competences.html">Nos Soins & Tarifs</a></li>
+                <li><a href="experiences.html">Expertise</a></li>
                 <li><a href="contact.html">Contact</a></li>
                 
                 <li id="nav-login"><a href="login.html" style="color: var(--gold-accent);">Se connecter</a></li>
@@ -57,6 +45,7 @@
                 <li><button id="theme-toggle" class="theme-btn">🌙</button></li>
             </ul>
         </nav>
+    </header>
     </header>
 
     <main style="margin-top: 120px; padding: 0 5%; min-height: 80vh;">
@@ -71,14 +60,15 @@
             </div>
             
             <div style="background: var(--card-bg); padding: clamp(1.5rem, 5vw, 3rem); border-radius: 15px; box-shadow: var(--shadow-premium); width: 100%;">
-                <form action="mailto:omar_oumay@hotmail.com" method="POST" enctype="text/plain">
+                
+                <form id="contact-form">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                        <input type="text" name="Nom" class="vip-input" placeholder="Nom *" required>
-                        <input type="text" name="Prenom" class="vip-input" placeholder="Prénom *" required>
+                        <input type="text" id="nom" class="vip-input" placeholder="Nom *" required>
+                        <input type="text" id="prenom" class="vip-input" placeholder="Prénom *" required>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                        <input type="tel" name="Tel" class="vip-input" placeholder="Téléphone *" required>
-                        <select name="Motif" class="vip-input" required style="background: transparent; color: inherit;">
+                        <input type="tel" id="telephone" class="vip-input" placeholder="Téléphone *" required>
+                        <select id="motif" class="vip-input" required style="background: transparent; color: inherit;">
                             <option value="" disabled selected>Motif de la demande *</option>
                             <option value="Consultation Cabinet">Consultation au Cabinet (La Marsa)</option>
                             <option value="Soins Domicile">Soins à Domicile</option>
@@ -88,11 +78,11 @@
                     </div>
                     
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                        <input type="text" name="Diagnostic" class="vip-input" placeholder="Diagnostic ou description de la douleur *" required>
-                        <input type="number" name="Seances" class="vip-input" placeholder="Nombre de séances voulu" min="1">
+                        <input type="text" id="diagnostic" class="vip-input" placeholder="Diagnostic ou description de la douleur *" required>
+                        <input type="number" id="seances" class="vip-input" placeholder="Nombre de séances voulu" min="1">
                     </div>
                     
-                    <textarea name="Message" class="vip-input" rows="4" placeholder="Précisez vos besoins ou vos disponibilités horaires..." style="width: 100%; margin-top: 1rem;"></textarea>
+                    <textarea id="message" class="vip-input" rows="4" placeholder="Précisez vos besoins ou vos disponibilités horaires..." style="width: 100%; margin-top: 1rem;"></textarea>
                     
                     <button type="submit" style="width: 100%; background: var(--gold-accent); color: white; border: none; padding: 1.2rem; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; margin-top: 1.5rem;">Envoyer ma demande</button>
                 </form>
@@ -120,30 +110,68 @@
     </a>
 
     <script src="script.js"></script>
-    const submitForm = async (e) => {
-    e.preventDefault();
-    
-    const formData = {
-        nom: document.getElementById('nom').value,
-        prenom: document.getElementById('prenom').value,
-        telephone: document.getElementById('telephone').value,
-        motif: document.getElementById('motif').value,
-        diagnostic: document.getElementById('diagnostic').value
-    };
 
-    try {
-        const response = await fetch('http://localhost:5000/api/appointments', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
+    <script>
+        // SCRIPT DE LA NAVBAR INTELLIGENTE
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
+
+            if (token) {
+                document.getElementById('nav-login').style.display = 'none';
+                document.getElementById('nav-register').style.display = 'none';
+                document.getElementById('nav-dashboard').style.display = 'inline-block';
+                document.getElementById('nav-logout').style.display = 'inline-block';
+                
+                const dashboardLink = document.getElementById('dashboard-link');
+                dashboardLink.href = role === 'admin' ? 'admin.html' : 'espace-patient.html';
+                
+                document.getElementById('logout-btn-nav').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('role');
+                    window.location.href = 'index.html';
+                });
+            }
         });
 
-        if (response.ok) {
-            alert("Rendez-vous enregistré avec succès !");
-        }
-    } catch (error) {
-        console.error("Erreur de connexion au serveur");
-    }
-};
+        // SCRIPT D'ENVOI DU FORMULAIRE SECURISE
+        document.getElementById('contact-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                nom: document.getElementById('nom').value,
+                prenom: document.getElementById('prenom').value,
+                telephone: document.getElementById('telephone').value,
+                motif: document.getElementById('motif').value,
+                diagnostic: document.getElementById('diagnostic').value
+            };
+
+            try {
+                // On récupère le token si le patient est connecté
+                const token = localStorage.getItem('token');
+
+                const response = await fetch('http://localhost:5000/api/appointments', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        // On envoie la clé d'identité au serveur
+                        'x-auth-token': token ? token : '' 
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    alert("Rendez-vous enregistré avec succès !");
+                    document.getElementById('contact-form').reset(); // Vide le formulaire
+                } else {
+                    alert("Erreur lors de l'enregistrement de votre rendez-vous.");
+                }
+            } catch (error) {
+                console.error("Erreur de connexion au serveur", error);
+                alert("Impossible de joindre le serveur. Assurez-vous qu'il est en ligne.");
+            }
+        });
+    </script>
 </body>
 </html>

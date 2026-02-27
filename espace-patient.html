@@ -19,12 +19,28 @@
 </head>
 <body>
 
-    <header class="dashboard-header">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="logo.png" alt="Logo Allo Kiné" style="width: 50px; border-radius: 50%;">
-            <h2 style="margin: 0; font-family: 'Georgia', serif; color: var(--gold-accent);">Mon Espace</h2>
-        </div>
-        <button id="logout-btn" class="logout-btn">Déconnexion</button>
+   <header>
+        <a href="index.html" class="logo-link">
+            <img src="logo.png" alt="Logo Allo Kiné" style="width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold-accent); object-fit: cover;">
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <div class="brand-name" style="line-height: 1;">ALLO KINÉ</div>
+                <div style="color: var(--gold-accent); font-size: 0.85rem; font-weight: bold; letter-spacing: 1.5px; margin-top: 4px; text-transform: uppercase;">
+                    Mon Espace Patient
+                </div>
+            </div>
+        </a>
+        
+        <div class="menu-toggle" id="mobile-menu">☰</div>
+        <nav>
+            <ul id="nav-menu">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="competences.html">Soins & Tarifs</a></li>
+                <li><a href="experiences.html">Expertise</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li id="nav-logout"><a href="#" id="logout-btn-nav" style="color: #ff4757; font-weight: bold;">Déconnexion</a></li>
+                <li><button id="theme-toggle" class="theme-btn">🌙</button></li>
+            </ul>
+        </nav>
     </header>
 
     <main class="dashboard-container">
