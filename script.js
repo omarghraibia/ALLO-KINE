@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const token = localStorage.getItem('token');
               
-                const response = await fetch('https://musical-goggles-6w9779q6v643x4p9-5000.app.github.dev/', {
+                const response = await fetch('/api/appointments'), {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',

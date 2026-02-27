@@ -76,7 +76,7 @@
         // --- CHARGER L'HISTORIQUE DES RDV ---
         const loadMyHistory = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/appointments/me', {
+                const response = await fetch('/api/appointments'), {
                     method: 'GET',
                     headers: { 'x-auth-token': token }
                 });
