@@ -28,11 +28,11 @@ app.use('/api/appointments', require('./routes/appointments'));
 app.use('/api/auth', require('./routes/auth'));
 
 // --- 🎨 AFFICHER LE VISUEL DU SITE WEB (FRONTEND) ---
-// On indique à Node.js de chercher les fichiers HTML/CSS dans le dossier parent (la racine)
+// On indique à Node.js de chercher les fichiers HTML/CSS dans le dossier parent
 app.use(express.static(path.join(__dirname, '../')));
 
-// Si quelqu'un visite ton lien, on lui envoie obligatoirement ton interface graphique
-app.get('*', (req, res) => {
+// CORRECTION ICI : On utilise une syntaxe compatible avec les nouvelles versions
+app.get(/^(?!\/api).+/, (req, res) => {
   res.sendFile(path.join(__dirname, '../index.html'));
 });
 
