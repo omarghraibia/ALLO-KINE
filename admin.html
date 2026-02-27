@@ -98,7 +98,18 @@
                 document.getElementById('appointments-body').innerHTML = '<tr><td colspan="6" style="text-align: center; color: #ff4757;">Impossible de se connecter au serveur backend.</td></tr>';
             }
         };
-
+// --- 📡 2. RÉCUPÉRATION DES DONNÉES ---
+const fetchAppointments = async () => {
+    try {
+        // Remplace 'http://localhost:5000' par ton URL Render (ex: https://allo-kine-api.onrender.com)
+        const response = await fetch('https://ton-projet-backend.onrender.com/api/appointments', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-auth-token': token 
+            }
+        });
+        
         // --- 📊 3. AFFICHAGE DANS LE TABLEAU ---
         const displayAppointments = (appointments) => {
             const tbody = document.getElementById('appointments-body');
