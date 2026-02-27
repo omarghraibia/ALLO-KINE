@@ -4,7 +4,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// --- 📝 INSCRIPTION (Pour les patients) ---
 router.post('/register', async (req, res) => {
     const { nom, prenom, telephone, email, password } = req.body;
     try {
@@ -26,7 +25,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// --- 🔐 CONNEXION (Pour tout le monde) ---
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     try {
@@ -39,7 +37,7 @@ router.post('/login', async (req, res) => {
         const payload = { user: { id: user.id, role: user.role } };
         jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 3600 }, (err, token) => {
             if (err) throw err;
-            res.json({ token, role: user.role }); // On renvoie le token ET le rôle
+            res.json({ token, role: user.role });
         });
     } catch (err) {
         res.status(500).send('Erreur serveur');

@@ -127,3 +127,56 @@ document.getElementById('votre-id-formulaire').addEventListener('submit', async 
         alert("Impossible de contacter le serveur. Vérifiez qu'il est bien lancé.");
     }
 });
+// 1. GESTION DU MENU MOBILE (Faire descendre le menu)
+const mobileMenu = document.getElementById('mobile-menu');
+const navMenu = document.querySelector('nav ul');
+
+if (mobileMenu && navMenu) {
+    mobileMenu.addEventListener('click', () => {
+        navMenu.classList.toggle('active'); // Fait glisser le menu sur téléphone
+    });
+}
+
+// 2. ANIMATIONS AU DÉFILEMENT (Faire apparaître les éléments)
+const reveals = document.querySelectorAll('.reveal');
+
+const revealOnScroll = () => {
+    const windowHeight = window.innerHeight;
+    const elementVisible = 100; // Déclenche l'animation 100px avant que l'élément n'arrive
+
+    reveals.forEach((reveal) => {
+        const elementTop = reveal.getBoundingClientRect().top;
+        if (elementTop < windowHeight - elementVisible) {
+            reveal.classList.add('active'); // Ajoute la classe qui rend visible
+        }
+    });
+};
+
+// On écoute la molette de la souris
+window.addEventListener('scroll', revealOnScroll);
+// On lance une fois au démarrage au cas où des éléments sont déjà à l'écran
+revealOnScroll(); 
+
+
+// 3. GESTION DU MODE SOMBRE / CLAIR
+const themeBtn = document.getElementById('theme-toggle');
+
+if (themeBtn) {
+    // Vérifier si l'utilisateur avait déjà choisi le mode sombre avant
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.dataset.theme = 'dark';
+        themeBtn.textContent = '☀️';
+    }
+
+    themeBtn.addEventListener('click', () => {
+        if (document.body.dataset.theme === 'dark') {
+            document.body.dataset.theme = 'light';
+            themeBtn.textContent = '🌙';
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.body.dataset.theme = 'dark';
+            themeBtn.textContent = '☀️';
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+}
