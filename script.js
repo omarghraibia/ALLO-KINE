@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.body;
     
     if (themeBtn) {
-        // Charger la préférence enregistrée
         if (localStorage.getItem('theme') === 'dark') {
             body.setAttribute('data-theme', 'dark');
             themeBtn.textContent = '☀️';
@@ -19,18 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 2. MENU MOBILE AMÉLIORÉ ---
+    // --- 2. MENU MOBILE ---
     const menuToggle = document.getElementById('mobile-menu');
     const navMenu = document.getElementById('nav-menu');
 
     if (menuToggle && navMenu) {
         menuToggle.addEventListener('click', () => {
             navMenu.classList.toggle('active');
-            // Transformer le hamburger en croix
             menuToggle.innerHTML = navMenu.classList.contains('active') ? '✖' : '☰';
         });
 
-        // Fermer le menu au clic sur un lien
         navMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
                 navMenu.classList.remove('active');
@@ -39,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 3. ANIMATIONS AU DÉFILEMENT (REVEAL) ---
+    // --- 3. ANIMATIONS AU DÉFILEMENT ---
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) entry.target.classList.add('active');
@@ -49,8 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 
-    // --- 4. FORMULAIRE DE RENDEZ-VOUS SECURISE ---
-    const contactForm = document.getElementById('contact-form'); // Assure-toi que l'ID est 'contact-form' dans ton HTML
+    // --- 4. FORMULAIRE DE RENDEZ-VOUS (Lien Railway) ---
+    const contactForm = document.getElementById('contact-form');
     if (contactForm) {
         contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -64,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                // CORRECTION ICI : Retrait de la parenthèse avant la virgule
+                // Utilisation du chemin relatif pour Railway
                 const response = await fetch('/api/appointments', {
                     method: 'POST',
                     headers: { 
@@ -78,11 +75,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert("Rendez-vous enregistré avec succès !");
                     contactForm.reset();
                 } else {
-                    alert("Erreur lors de l'enregistrement.");
+                    const errorData = await response.json();
+                    alert("Erreur : " + (errorData.msg || "enregistrement impossible"));
                 }
             } catch (error) {
-                console.error("Erreur connexion:", error);
-                alert("Impossible de contacter le serveur.");
+                console.error("Erreur connexion Railway:", error);
+                alert("Impossible de contacter le serveur de santé.");
             }
         });
     }
@@ -121,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-            .then(() => console.log('PWA prête !'))
+            .then(() => console.log('PWA Allo-Kiné Prête !'))
             .catch(err => console.error('Erreur PWA:', err));
     });
 }
